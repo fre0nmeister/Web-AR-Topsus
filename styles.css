@@ -681,19 +681,32 @@ img {
 }
 
 /* ===== AR Button ===== */
-.btn-ar {
-  display: inline-block;
+.btn-ar,
+.article-body .btn-ar,
+.article-body a.btn-ar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 12px;
-  background: #0064d2;
-  color: white;
-  padding: 12px 18px;
+  background: linear-gradient(135deg, #0064d2, #0084ff);
+  color: #ffffff !important;
+  padding: 12px 22px;
   border-radius: 10px;
   font-weight: 600;
-  transition: background 0.2s;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 100, 210, 0.3);
+  text-decoration: none !important;
 }
 
-.btn-ar:hover {
-  background: #004fa3;
+.btn-ar:hover,
+.article-body .btn-ar:hover,
+.article-body a.btn-ar:hover {
+  background: linear-gradient(135deg, #004fa3, #0064d2);
+  color: #ffffff !important;
+  text-decoration: none !important;
+  box-shadow: 0 6px 20px rgba(0, 100, 210, 0.4);
+  transform: translateY(-2px);
 }
 
 .ar-button-wrapper {

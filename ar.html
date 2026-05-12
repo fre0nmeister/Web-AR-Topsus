@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
   <title>AR Rumah Adat</title>
 
@@ -14,10 +14,15 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
+    html,
     body {
       margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-      font-family: sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background: transparent;
     }
 
     .back-button {
@@ -25,12 +30,145 @@
       top: 20px;
       left: 20px;
       z-index: 9999;
-      background: white;
-      color: black;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a1a2e;
       text-decoration: none;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-weight: bold;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+    }
+
+    .back-button:active {
+      transform: scale(0.95);
+    }
+
+    /* Hide A-Frame default UI overlays */
+    .a-enter-vr-button,
+    .a-orientation-modal {
+      display: none !important;
+    }
+
+    /* ===== AR Controls ===== */
+    .ar-controls {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .ar-controls.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Zoom buttons - vertical stack */
+    .zoom-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .zoom-group .zoom-label {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .zoom-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* D-Pad - keyboard arrow layout */
+    .dpad {
+      display: grid;
+      grid-template-columns: 40px 40px 40px;
+      grid-template-rows: 40px 40px;
+      gap: 4px;
+    }
+
+    .dpad-up    { grid-column: 2; grid-row: 1; }
+    .dpad-left  { grid-column: 1; grid-row: 2; }
+    .dpad-down  { grid-column: 2; grid-row: 2; }
+    .dpad-right { grid-column: 3; grid-row: 2; }
+
+    .ctrl-divider {
+      width: 1px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .ctrl-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.13);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.12s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .ctrl-btn:active {
+      background: rgba(255, 255, 255, 0.35);
+      transform: scale(0.88);
+    }
+
+    .ctrl-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    /* Model name indicator */
+    .model-name {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .model-name.visible {
+      opacity: 1;
     }
   </style>
 </head>
@@ -41,8 +179,48 @@
     ← Kembali
   </a>
 
-  <a-scene mindar-image="imageTargetSrc: targets.mind;" color-space="sRGB" embedded vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false" renderer="colorManagement: true, physicallyCorrectLights">
+  <!-- Model name indicator -->
+  <div class="model-name" id="modelName"></div>
+
+  <!-- AR Controls -->
+  <div class="ar-controls" id="arControls">
+
+    <!-- Zoom buttons -->
+    <div class="zoom-group">
+      <span class="zoom-label">Zoom</span>
+      <div class="zoom-buttons">
+        <button class="ctrl-btn" id="btnZoomOut" title="Zoom Out">−</button>
+        <button class="ctrl-btn" id="btnZoomIn" title="Zoom In">+</button>
+      </div>
+    </div>
+
+    <div class="ctrl-divider"></div>
+
+    <!-- D-Pad: Arrow key layout -->
+    <!--
+         [ ▲ Up ]
+      [◄ Left][▼ Down][► Right]
+    -->
+    <div class="dpad">
+      <button class="ctrl-btn dpad-up" id="btnUp" title="Naik">
+        <svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+      </button>
+      <button class="ctrl-btn dpad-left" id="btnRotateLeft" title="Putar Kiri">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </button>
+      <button class="ctrl-btn dpad-down" id="btnDown" title="Turun">
+        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+      </button>
+      <button class="ctrl-btn dpad-right" id="btnRotateRight" title="Putar Kanan">
+        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+      </button>
+    </div>
+
+  </div>
+
+  <a-scene mindar-image="imageTargetSrc: targets.mind;" color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true" vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false">
 
     <!-- Camera -->
     <a-camera position="0 0 0" look-controls="enabled: false">
@@ -53,10 +231,9 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 0">
-
-      <a-gltf-model src="models/gadang.glb" position="0 0 0" rotation="0 0 0" scale="0.3 0.3 0.3">
+      <a-gltf-model id="model-0" data-name="Rumah Gadang" src="models/gadang.glb" position="0 0.15 0.1"
+        rotation="-15 180 0" scale="0.08 0.08 0.08">
       </a-gltf-model>
-
     </a-entity>
 
     <!-- ================================= -->
@@ -64,10 +241,9 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 1">
-
-      <a-gltf-model src="models/joglo.glb" position="0 0 0" rotation="0 0 0" scale="0.3 0.3 0.3">
+      <a-gltf-model id="model-1" data-name="Rumah Joglo" src="models/joglo.glb" position="0 0.15 0.1" rotation="-15 0 0"
+        scale="0.50 0.50 0.50">
       </a-gltf-model>
-
     </a-entity>
 
     <!-- ================================= -->
@@ -75,10 +251,9 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 2">
-
-      <a-gltf-model src="models/tongkonan.glb" position="0 0 0" rotation="0 0 0" scale="0.3 0.3 0.3">
+      <a-gltf-model id="model-2" data-name="Rumah Tongkonan" src="models/tongkonan.glb" position="0 0.15 0.1"
+        rotation="-15 0 0" scale="0.80 0.80 0.80">
       </a-gltf-model>
-
     </a-entity>
 
     <!-- ================================= -->
@@ -86,10 +261,9 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 3">
-
-      <a-gltf-model src="models/honai.glb" position="0 0 0" rotation="0 0 0" scale="0.3 0.3 0.3">
+      <a-gltf-model id="model-3" data-name="Rumah Honai" src="models/honai.glb" position="0 0.15 0.1" rotation="-15 0 0"
+        scale="0.50 0.50 0.50">
       </a-gltf-model>
-
     </a-entity>
 
     <!-- ================================= -->
@@ -97,13 +271,152 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 4">
-
-      <a-gltf-model src="models/bolon.glb" position="0 0 0" rotation="0 0 0" scale="0.3 0.3 0.3">
+      <a-gltf-model id="model-4" data-name="Rumah Bolon" src="models/bolon.glb" position="0 0.15 0.1" rotation="-15 0 0"
+        scale="0.08 0.08 0.08">
       </a-gltf-model>
-
     </a-entity>
 
   </a-scene>
+
+  <script>
+    // ===== AR Model Controls =====
+    const controls = document.getElementById('arControls');
+    const modelNameEl = document.getElementById('modelName');
+    let activeModel = null;
+
+    // Track which model is currently visible
+    const targets = document.querySelectorAll('[mindar-image-target]');
+    targets.forEach((target) => {
+      target.addEventListener('targetFound', () => {
+        const model = target.querySelector('a-gltf-model');
+        activeModel = model;
+        controls.classList.add('visible');
+        modelNameEl.textContent = model.dataset.name || 'Model';
+        modelNameEl.classList.add('visible');
+      });
+
+      target.addEventListener('targetLost', () => {
+        activeModel = null;
+        controls.classList.remove('visible');
+        modelNameEl.classList.remove('visible');
+      });
+    });
+
+    // Zoom step, rotation step & position step
+    const ZOOM_STEP = 0.02;
+    const ROTATE_STEP = 15; // degrees
+    const POS_STEP = 0.05; // position Y step
+    const MIN_SCALE = 0.01;
+    const MAX_SCALE = 0.5;
+
+    // Helper: get current scale as number
+    function getScale(el) {
+      const s = el.getAttribute('scale');
+      return s.x;
+    }
+
+    // Zoom In
+    document.getElementById('btnZoomIn').addEventListener('click', () => {
+      if (!activeModel) return;
+      const current = getScale(activeModel);
+      const newScale = Math.min(current + ZOOM_STEP, MAX_SCALE);
+      activeModel.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
+    });
+
+    // Zoom Out
+    document.getElementById('btnZoomOut').addEventListener('click', () => {
+      if (!activeModel) return;
+      const current = getScale(activeModel);
+      const newScale = Math.max(current - ZOOM_STEP, MIN_SCALE);
+      activeModel.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
+    });
+
+    // Rotate Left
+    document.getElementById('btnRotateLeft').addEventListener('click', () => {
+      if (!activeModel) return;
+      const rot = activeModel.getAttribute('rotation');
+      activeModel.setAttribute('rotation', `${rot.x} ${rot.y - ROTATE_STEP} ${rot.z}`);
+    });
+
+    // Rotate Right
+    document.getElementById('btnRotateRight').addEventListener('click', () => {
+      if (!activeModel) return;
+      const rot = activeModel.getAttribute('rotation');
+      activeModel.setAttribute('rotation', `${rot.x} ${rot.y + ROTATE_STEP} ${rot.z}`);
+    });
+
+    // Move Up
+    document.getElementById('btnUp').addEventListener('click', () => {
+      if (!activeModel) return;
+      const pos = activeModel.getAttribute('position');
+      activeModel.setAttribute('position', `${pos.x} ${pos.y + POS_STEP} ${pos.z}`);
+    });
+
+    // Move Down
+    document.getElementById('btnDown').addEventListener('click', () => {
+      if (!activeModel) return;
+      const pos = activeModel.getAttribute('position');
+      activeModel.setAttribute('position', `${pos.x} ${pos.y - POS_STEP} ${pos.z}`);
+    });
+
+    // Long-press support for continuous zoom/rotate
+    let holdInterval = null;
+    function addHoldSupport(btnId, action) {
+      const btn = document.getElementById(btnId);
+      let timeout;
+      const start = (e) => {
+        e.preventDefault();
+        action();
+        timeout = setTimeout(() => {
+          holdInterval = setInterval(action, 100);
+        }, 300);
+      };
+      const stop = () => {
+        clearTimeout(timeout);
+        clearInterval(holdInterval);
+        holdInterval = null;
+      };
+      btn.addEventListener('touchstart', start, { passive: false });
+      btn.addEventListener('mousedown', start);
+      btn.addEventListener('touchend', stop);
+      btn.addEventListener('touchcancel', stop);
+      btn.addEventListener('mouseup', stop);
+      btn.addEventListener('mouseleave', stop);
+    }
+
+    addHoldSupport('btnZoomIn', () => {
+      if (!activeModel) return;
+      const s = getScale(activeModel);
+      const ns = Math.min(s + ZOOM_STEP, MAX_SCALE);
+      activeModel.setAttribute('scale', `${ns} ${ns} ${ns}`);
+    });
+    addHoldSupport('btnZoomOut', () => {
+      if (!activeModel) return;
+      const s = getScale(activeModel);
+      const ns = Math.max(s - ZOOM_STEP, MIN_SCALE);
+      activeModel.setAttribute('scale', `${ns} ${ns} ${ns}`);
+    });
+    addHoldSupport('btnRotateLeft', () => {
+      if (!activeModel) return;
+      const rot = activeModel.getAttribute('rotation');
+      activeModel.setAttribute('rotation', `${rot.x} ${rot.y - ROTATE_STEP} ${rot.z}`);
+    });
+    addHoldSupport('btnRotateRight', () => {
+      if (!activeModel) return;
+      const rot = activeModel.getAttribute('rotation');
+      activeModel.setAttribute('rotation', `${rot.x} ${rot.y + ROTATE_STEP} ${rot.z}`);
+    });
+    addHoldSupport('btnUp', () => {
+      if (!activeModel) return;
+      const pos = activeModel.getAttribute('position');
+      activeModel.setAttribute('position', `${pos.x} ${pos.y + POS_STEP} ${pos.z}`);
+    });
+    addHoldSupport('btnDown', () => {
+      if (!activeModel) return;
+      const pos = activeModel.getAttribute('position');
+      activeModel.setAttribute('position', `${pos.x} ${pos.y - POS_STEP} ${pos.z}`);
+    });
+  </script>
 
 </body>
 
