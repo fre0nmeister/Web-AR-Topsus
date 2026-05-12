@@ -125,6 +125,44 @@
           adat, hingga pusat kegiatan sosial masyarakat.
         </p>
 
+        <!-- AR Guide Card -->
+        <div class="ar-guide-card" id="ar-guide-card">
+          <div class="ar-guide-header">
+            <div>
+              <div class="ar-guide-title">Fitur Augmented Reality</div>
+              <p class="ar-guide-subtitle">Lihat rumah adat dalam bentuk 3D langsung dari layar HP kamu!</p>
+            </div>
+          </div>
+          <div class="ar-guide-steps">
+            <div class="ar-guide-step">
+              <div class="ar-guide-step-num">1</div>
+              <div class="ar-guide-step-text">Buka halaman ini di <strong>HP</strong> kamu melalui browser</div>
+            </div>
+            <div class="ar-guide-step">
+              <div class="ar-guide-step-num">2</div>
+              <div class="ar-guide-step-text">Tekan tombol <strong>"Lihat dalam AR"</strong> pada setiap rumah adat di
+                bawah</div>
+            </div>
+            <div class="ar-guide-step">
+              <div class="ar-guide-step-num">3</div>
+              <div class="ar-guide-step-text">Arahkan <strong>kamera HP</strong> ke gambar rumah adat yang ada di
+                artikel ini</div>
+            </div>
+            <div class="ar-guide-step">
+              <div class="ar-guide-step-num">4</div>
+              <div class="ar-guide-step-text">Model 3D akan muncul! Gunakan tombol kontrol untuk <strong>zoom, geser,
+                  dan putar</strong></div>
+            </div>
+          </div>
+          <div class="ar-guide-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+            </svg>
+            <span>Pastikan browser kamu mengizinkan akses kamera saat diminta.</span>
+          </div>
+        </div>
+
         <!-- Section 1: Rumah Gadang -->
         <h2 id="section-gadang">1. Rumah Gadang – Sumatra Barat</h2>
         <div class="section-image" id="img-gadang">
@@ -345,6 +383,150 @@
       </div>
     </div>
   </footer>
+
+  <style>
+    /* AR Button */
+    .btn-ar,
+    .article-body .btn-ar,
+    .article-body a.btn-ar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      background: linear-gradient(135deg, #0064d2, #0084ff);
+      color: #ffffff !important;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 100, 210, 0.3);
+      text-decoration: none !important;
+    }
+
+    .btn-ar:hover,
+    .article-body .btn-ar:hover,
+    .article-body a.btn-ar:hover {
+      background: linear-gradient(135deg, #004fa3, #0064d2);
+      color: #ffffff !important;
+      text-decoration: none !important;
+      box-shadow: 0 6px 20px rgba(0, 100, 210, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .ar-button-wrapper {
+      margin-bottom: 24px;
+    }
+
+    /* AR Guide Card */
+    .ar-guide-card {
+      background: linear-gradient(135deg, #f0f6ff 0%, #e8f0fe 100%);
+      border: 1px solid #c8ddf5;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ar-guide-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #0064d2, #00a1ff, #0064d2);
+    }
+
+    .ar-guide-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .ar-guide-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0064d2, #00a1ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .ar-guide-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 2px;
+    }
+
+    .ar-guide-subtitle {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    .ar-guide-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .ar-guide-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .ar-guide-step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #0064d2;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .ar-guide-step-text {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+      padding-top: 2px;
+    }
+
+    .ar-guide-step-text strong {
+      color: #0064d2;
+      font-weight: 600;
+    }
+
+    .ar-guide-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #777;
+      padding-top: 4px;
+      border-top: 1px solid #d8e6f5;
+      padding-top: 12px;
+    }
+
+    .ar-guide-note svg {
+      color: #0064d2;
+      flex-shrink: 0;
+    }
+  </style>
 
   <!-- ===== Scroll Spy Script ===== -->
   <script>

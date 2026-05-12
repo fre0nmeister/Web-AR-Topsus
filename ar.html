@@ -170,6 +170,112 @@
     .model-name.visible {
       opacity: 1;
     }
+
+    /* ===== Instruction Overlay ===== */
+    .instruction-overlay {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      width: 90%;
+      max-width: 340px;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 24px 20px 20px;
+      color: #fff;
+      text-align: center;
+      transition: all 0.4s ease;
+      opacity: 1;
+    }
+
+    .instruction-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(20px);
+    }
+
+    .instruction-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse-icon 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.8; }
+    }
+
+    .instruction-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: #fff;
+    }
+
+    .instruction-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .instruction-steps {
+      text-align: left;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px;
+    }
+
+    .instruction-steps li {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 6px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.4;
+    }
+
+    .step-num {
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .instruction-dismiss {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .instruction-dismiss:active {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0.95);
+    }
   </style>
 </head>
 
@@ -181,6 +287,20 @@
 
   <!-- Model name indicator -->
   <div class="model-name" id="modelName"></div>
+
+  <!-- Instruction Overlay -->
+  <div class="instruction-overlay" id="instructionOverlay">
+    <div class="instruction-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    </div>
+    <div class="instruction-title">Cara Menggunakan AR</div>
+    <ul class="instruction-steps">
+      <li><span class="step-num">1</span> Arahkan kamera ke gambar rumah adat di artikel</li>
+      <li><span class="step-num">2</span> Tunggu hingga model 3D muncul di atas gambar</li>
+      <li><span class="step-num">3</span> Gunakan tombol kontrol untuk zoom, geser, dan putar model</li>
+    </ul>
+    <button class="instruction-dismiss" id="btnDismissInstruction">Mengerti</button>
+  </div>
 
   <!-- AR Controls -->
   <div class="ar-controls" id="arControls">
@@ -284,6 +404,16 @@
     const modelNameEl = document.getElementById('modelName');
     let activeModel = null;
 
+    // Instruction overlay
+    const instructionOverlay = document.getElementById('instructionOverlay');
+    const btnDismiss = document.getElementById('btnDismissInstruction');
+    let instructionDismissed = false;
+
+    btnDismiss.addEventListener('click', () => {
+      instructionOverlay.classList.add('hidden');
+      instructionDismissed = true;
+    });
+
     // Track which model is currently visible
     const targets = document.querySelectorAll('[mindar-image-target]');
     targets.forEach((target) => {
@@ -293,12 +423,20 @@
         controls.classList.add('visible');
         modelNameEl.textContent = model.dataset.name || 'Model';
         modelNameEl.classList.add('visible');
+
+        // Hide instruction when target found
+        instructionOverlay.classList.add('hidden');
       });
 
       target.addEventListener('targetLost', () => {
         activeModel = null;
         controls.classList.remove('visible');
         modelNameEl.classList.remove('visible');
+
+        // Show instruction again if not dismissed
+        if (!instructionDismissed) {
+          instructionOverlay.classList.remove('hidden');
+        }
       });
     });
 
