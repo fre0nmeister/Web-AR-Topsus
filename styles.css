@@ -317,8 +317,7 @@ img {
 .hero-image img {
   width: 100%;
   border-radius: 12px;
-  object-fit: cover;
-  max-height: 420px;
+  display: block;
 }
 
 .image-caption {
@@ -377,8 +376,7 @@ img {
 
 .section-image img {
   width: 100%;
-  object-fit: cover;
-  max-height: 360px;
+  display: block;
   border-radius: 12px;
   transition: transform 0.3s ease;
 }
@@ -537,7 +535,8 @@ img {
   gap: 8px;
 }
 
-.footer-col ul li a {
+.footer-col ul li a,
+.footer-col ul li span {
   font-size: 13px;
   color: #999;
   transition: color 0.2s;

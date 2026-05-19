@@ -148,27 +148,65 @@
       fill: #fff;
     }
 
-    /* Model name indicator */
-    .model-name {
+    /* Info Card */
+    .info-card {
       position: fixed;
       top: 20px;
       right: 20px;
       z-index: 9999;
-      background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       color: #fff;
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
+      padding: 14px 18px;
+      border-radius: 16px;
       border: 1px solid rgba(255, 255, 255, 0.15);
+      max-width: 200px;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      pointer-events: none;
+      transform: translateX(20px);
+      transition: all 0.4s ease;
     }
 
-    .model-name.visible {
+    .info-card.visible {
       opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .info-card-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-card-name::before {
+      content: '🏠';
+      font-size: 16px;
+    }
+
+    .info-card-origin {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-card-detail {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.5;
+    }
+
+    .info-card-hint {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 8px;
+      font-style: italic;
     }
 
     /* ===== Instruction Overlay ===== */
@@ -285,8 +323,13 @@
     ← Kembali
   </a>
 
-  <!-- Model name indicator -->
-  <div class="model-name" id="modelName"></div>
+  <!-- Info Card -->
+  <div class="info-card" id="infoCard">
+    <div class="info-card-name" id="infoCardName"></div>
+    <div class="info-card-origin" id="infoCardOrigin"></div>
+    <div class="info-card-detail" id="infoCardDetail"></div>
+    <div class="info-card-hint">Geser layar untuk memutar model</div>
+  </div>
 
   <!-- Instruction Overlay -->
   <div class="instruction-overlay" id="instructionOverlay">
@@ -297,7 +340,7 @@
     <ul class="instruction-steps">
       <li><span class="step-num">1</span> Arahkan kamera ke gambar rumah adat di artikel</li>
       <li><span class="step-num">2</span> Tunggu hingga model 3D muncul di atas gambar</li>
-      <li><span class="step-num">3</span> Gunakan tombol kontrol untuk zoom, geser, dan putar model</li>
+      <li><span class="step-num">3</span> Geser layar untuk memutar model, atau gunakan tombol kontrol untuk zoom dan posisi</li>
     </ul>
     <button class="instruction-dismiss" id="btnDismissInstruction">Mengerti</button>
   </div>
@@ -351,7 +394,7 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 0">
-      <a-gltf-model id="model-0" data-name="Rumah Gadang" src="models/gadang.glb" position="0 0.15 0.1"
+      <a-gltf-model id="model-0" data-name="Rumah Gadang" data-origin="Sumatra Barat" data-detail="Atap gonjong menyerupai tanduk kerbau. Suku Minangkabau, sistem matrilineal." src="models/gadang.glb?v=2" position="0 0.15 0.1"
         rotation="-15 180 0" scale="0.08 0.08 0.08">
       </a-gltf-model>
     </a-entity>
@@ -361,7 +404,7 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 1">
-      <a-gltf-model id="model-1" data-name="Rumah Joglo" src="models/joglo.glb" position="0 0.15 0.1" rotation="-15 0 0"
+      <a-gltf-model id="model-1" data-name="Rumah Joglo" data-origin="Jawa Tengah & Yogyakarta" data-detail="Atap tinggi bertingkat dengan saka guru. Simbol keselarasan masyarakat Jawa." src="models/joglo.glb" position="0 0.15 0.1" rotation="-15 0 0"
         scale="0.50 0.50 0.50">
       </a-gltf-model>
     </a-entity>
@@ -371,7 +414,7 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 2">
-      <a-gltf-model id="model-2" data-name="Rumah Tongkonan" src="models/tongkonan.glb" position="0 0.15 0.1"
+      <a-gltf-model id="model-2" data-name="Rumah Tongkonan" data-origin="Sulawesi Selatan" data-detail="Atap melengkung menyerupai perahu. Suku Toraja, selalu menghadap ke utara." src="models/tongkonan.glb" position="0 0.15 0.1"
         rotation="-15 0 0" scale="0.80 0.80 0.80">
       </a-gltf-model>
     </a-entity>
@@ -381,7 +424,7 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 3">
-      <a-gltf-model id="model-3" data-name="Rumah Honai" src="models/honai.glb" position="0 0.15 0.1" rotation="-15 0 0"
+      <a-gltf-model id="model-3" data-name="Rumah Honai" data-origin="Papua" data-detail="Bentuk bundar dengan atap kerucut jerami. Suku Dani, dirancang untuk daerah dingin." src="models/honai.glb" position="0 0.15 0.1" rotation="-15 0 0"
         scale="0.50 0.50 0.50">
       </a-gltf-model>
     </a-entity>
@@ -391,7 +434,7 @@
     <!-- ================================= -->
 
     <a-entity mindar-image-target="targetIndex: 4">
-      <a-gltf-model id="model-4" data-name="Rumah Bolon" src="models/bolon.glb" position="0 0.15 0.1" rotation="-15 0 0"
+      <a-gltf-model id="model-4" data-name="Rumah Bolon" data-origin="Sumatra Utara" data-detail="Rumah panggung suku Batak dengan ukiran simbolis. Pusat aktivitas adat keluarga." src="models/bolon.glb" position="0 0.15 0.1" rotation="-15 0 0"
         scale="0.08 0.08 0.08">
       </a-gltf-model>
     </a-entity>
@@ -401,8 +444,15 @@
   <script>
     // ===== AR Model Controls =====
     const controls = document.getElementById('arControls');
-    const modelNameEl = document.getElementById('modelName');
+    const infoCard = document.getElementById('infoCard');
+    const infoCardName = document.getElementById('infoCardName');
+    const infoCardOrigin = document.getElementById('infoCardOrigin');
+    const infoCardDetail = document.getElementById('infoCardDetail');
     let activeModel = null;
+
+    // Sound effect
+    const scanSound = new Audio('sounds/shimmering.mp3');
+    scanSound.volume = 0.6;
 
     // Instruction overlay
     const instructionOverlay = document.getElementById('instructionOverlay');
@@ -421,8 +471,16 @@
         const model = target.querySelector('a-gltf-model');
         activeModel = model;
         controls.classList.add('visible');
-        modelNameEl.textContent = model.dataset.name || 'Model';
-        modelNameEl.classList.add('visible');
+
+        // Populate info card
+        infoCardName.textContent = model.dataset.name || 'Model';
+        infoCardOrigin.textContent = model.dataset.origin || '';
+        infoCardDetail.textContent = model.dataset.detail || '';
+        infoCard.classList.add('visible');
+
+        // Play sound effect
+        scanSound.currentTime = 0;
+        scanSound.play().catch(() => {});
 
         // Hide instruction when target found
         instructionOverlay.classList.add('hidden');
@@ -431,7 +489,7 @@
       target.addEventListener('targetLost', () => {
         activeModel = null;
         controls.classList.remove('visible');
-        modelNameEl.classList.remove('visible');
+        infoCard.classList.remove('visible');
 
         // Show instruction again if not dismissed
         if (!instructionDismissed) {
@@ -440,12 +498,12 @@
       });
     });
 
-    // Zoom step, rotation step & position step
-    const ZOOM_STEP = 0.02;
+    // Zoom factor, rotation step & position step
+    const ZOOM_FACTOR = 1.15; // 15% per click (proportional)
     const ROTATE_STEP = 15; // degrees
     const POS_STEP = 0.05; // position Y step
-    const MIN_SCALE = 0.01;
-    const MAX_SCALE = 0.5;
+    const MIN_SCALE = 0.005;
+    const MAX_SCALE = 10;
 
     // Helper: get current scale as number
     function getScale(el) {
@@ -453,19 +511,19 @@
       return s.x;
     }
 
-    // Zoom In
+    // Zoom In (proportional)
     document.getElementById('btnZoomIn').addEventListener('click', () => {
       if (!activeModel) return;
       const current = getScale(activeModel);
-      const newScale = Math.min(current + ZOOM_STEP, MAX_SCALE);
+      const newScale = Math.min(current * ZOOM_FACTOR, MAX_SCALE);
       activeModel.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
     });
 
-    // Zoom Out
+    // Zoom Out (proportional)
     document.getElementById('btnZoomOut').addEventListener('click', () => {
       if (!activeModel) return;
       const current = getScale(activeModel);
-      const newScale = Math.max(current - ZOOM_STEP, MIN_SCALE);
+      const newScale = Math.max(current / ZOOM_FACTOR, MIN_SCALE);
       activeModel.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
     });
 
@@ -525,13 +583,13 @@
     addHoldSupport('btnZoomIn', () => {
       if (!activeModel) return;
       const s = getScale(activeModel);
-      const ns = Math.min(s + ZOOM_STEP, MAX_SCALE);
+      const ns = Math.min(s * ZOOM_FACTOR, MAX_SCALE);
       activeModel.setAttribute('scale', `${ns} ${ns} ${ns}`);
     });
     addHoldSupport('btnZoomOut', () => {
       if (!activeModel) return;
       const s = getScale(activeModel);
-      const ns = Math.max(s - ZOOM_STEP, MIN_SCALE);
+      const ns = Math.max(s / ZOOM_FACTOR, MIN_SCALE);
       activeModel.setAttribute('scale', `${ns} ${ns} ${ns}`);
     });
     addHoldSupport('btnRotateLeft', () => {
@@ -554,6 +612,74 @@
       const pos = activeModel.getAttribute('position');
       activeModel.setAttribute('position', `${pos.x} ${pos.y - POS_STEP} ${pos.z}`);
     });
+
+    // ===== Touch Drag Rotation (orbit like a ball) =====
+    const TOUCH_SENSITIVITY = 0.4; // degrees per pixel dragged
+    let isDragging = false;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
+    // Only listen on the canvas/scene area, not on UI buttons
+    const sceneEl = document.querySelector('a-scene');
+
+    sceneEl.addEventListener('touchstart', (e) => {
+      if (!activeModel) return;
+      // Don't intercept if touching a button
+      if (e.target.closest('.ar-controls') || e.target.closest('.instruction-overlay') || e.target.closest('.back-button')) return;
+      isDragging = true;
+      lastTouchX = e.touches[0].clientX;
+      lastTouchY = e.touches[0].clientY;
+    }, { passive: true });
+
+    sceneEl.addEventListener('touchmove', (e) => {
+      if (!isDragging || !activeModel) return;
+
+      const touchX = e.touches[0].clientX;
+      const touchY = e.touches[0].clientY;
+      const deltaX = touchX - lastTouchX;
+      const deltaY = touchY - lastTouchY;
+
+      const rot = activeModel.getAttribute('rotation');
+      // Swipe left/right → rotate Y axis
+      // Swipe up/down → rotate X axis
+      const newRotY = rot.y + (deltaX * TOUCH_SENSITIVITY);
+      const newRotX = rot.x - (deltaY * TOUCH_SENSITIVITY);
+
+      activeModel.setAttribute('rotation', `${newRotX} ${newRotY} ${rot.z}`);
+
+      lastTouchX = touchX;
+      lastTouchY = touchY;
+    }, { passive: true });
+
+    sceneEl.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    sceneEl.addEventListener('touchcancel', () => {
+      isDragging = false;
+    });
+
+    // Mouse drag support (for desktop testing)
+    sceneEl.addEventListener('mousedown', (e) => {
+      if (!activeModel) return;
+      if (e.target.closest('.ar-controls') || e.target.closest('.instruction-overlay') || e.target.closest('.back-button')) return;
+      isDragging = true;
+      lastTouchX = e.clientX;
+      lastTouchY = e.clientY;
+    });
+
+    sceneEl.addEventListener('mousemove', (e) => {
+      if (!isDragging || !activeModel) return;
+      const deltaX = e.clientX - lastTouchX;
+      const deltaY = e.clientY - lastTouchY;
+      const rot = activeModel.getAttribute('rotation');
+      activeModel.setAttribute('rotation', `${rot.x - (deltaY * TOUCH_SENSITIVITY)} ${rot.y + (deltaX * TOUCH_SENSITIVITY)} ${rot.z}`);
+      lastTouchX = e.clientX;
+      lastTouchY = e.clientY;
+    });
+
+    sceneEl.addEventListener('mouseup', () => { isDragging = false; });
+    sceneEl.addEventListener('mouseleave', () => { isDragging = false; });
   </script>
 
 </body>
